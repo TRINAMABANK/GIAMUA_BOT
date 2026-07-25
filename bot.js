@@ -446,9 +446,9 @@ bot.callbackQuery("payment_bank", async (ctx) => {
   const ACCOUNT_NAME = process.env.BANK_ACCOUNT_NAME || "Cửa hàng";
   const ORDER_CODE = `DH${Date.now().toString().slice(-6)}`; // Mã đơn hàng ngẫu nhiên
 
-  // Tạo đường dẫn ảnh VietQR theo chuẩn API
+  // Tạo đường dẫn ảnh VietQR theo chuẩn API (Dùng định dạng .jpg và uppercase BANK_ID để tương thích tối đa với app ngân hàng)
   const description = encodeURIComponent(`Thanh toan don hang ${ORDER_CODE}`);
-  const vietQrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${totalAmount}&addInfo=${description}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+  const vietQrUrl = `https://img.vietqr.io/image/${BANK_ID.toUpperCase()}-${ACCOUNT_NO}-compact2.jpg?amount=${Math.round(totalAmount)}&addInfo=${description}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
 
   const instructions = `🏦 <b>HƯỚNG DẪN CHUYỂN KHOẢN:</b>\n\n` +
     `🔹 Ngân hàng: <b>${BANK_ID.toUpperCase()}</b>\n` +
