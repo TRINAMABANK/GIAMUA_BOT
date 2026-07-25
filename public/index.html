@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shop GIAMUA.COM.VN - Trà Thượng Hạng</title>
+  <!-- Google Fonts Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header class="header">
+    <div class="container header-container">
+      <div class="logo-area">
+        <h1>GIAMUA.COM.VN</h1>
+        <p>✨ Trà Thượng Hạng Đôi Dép ✨</p>
+      </div>
+      <div class="cart-trigger" id="cartTrigger">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-container">
+      <h2>Thưởng Thức Trà Đạo 24/7</h2>
+      <p>Chọn các sản phẩm trà cao cấp dưới đây và đặt mua trực tiếp siêu tốc!</p>
+    </div>
+  </section>
+
+  <!-- Products Catalog Grid -->
+  <main class="container catalog-container">
+    <div class="products-grid" id="productsGrid">
+      <!-- Products will be injected here via JavaScript -->
+      <div class="loading-spinner">Đang tải danh sách sản phẩm...</div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Shop GIAMUA.COM.VN. Bảo lưu mọi quyền.</p>
+    </div>
+  </footer>
+
+  <!-- Product Detail Modal (Collapsible details) -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeDetailModal">&times;</span>
+      <div class="modal-body" id="detailModalBody">
+        <!-- Injected product detail -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart & Checkout Drawer -->
+  <div class="drawer-backdrop" id="cartDrawer">
+    <div class="drawer">
+      <div class="drawer-header">
+        <h3>🛒 Giỏ Hàng Của Bạn</h3>
+        <span class="close-btn" id="closeCartDrawer">&times;</span>
+      </div>
+      
+      <div class="drawer-body">
+        <!-- Cart Items List -->
+        <div class="cart-items-list" id="cartItemsList">
+          <!-- Cart items injected here -->
+        </div>
+
+        <div class="cart-summary" id="cartSummary">
+          <div class="summary-row">
+            <span>Tổng tiền thanh toán:</span>
+            <strong id="cartTotal">0 ₫</strong>
+          </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <form class="checkout-form" id="checkoutForm">
+          <h4>📝 Thông Tin Giao Hàng</h4>
+          
+          <div class="form-group">
+            <label for="customerName">Họ và Tên người nhận</label>
+            <input type="text" id="customerName" placeholder="Ví dụ: Nguyễn Văn A" required>
+          </div>
+
+          <div class="form-group">
+            <label for="customerPhone">Số điện thoại liên hệ</label>
+            <input type="tel" id="customerPhone" placeholder="Ví dụ: 0987654321" required>
+          </div>
+
+          <div class="form-group">
+            <label for="customerAddress">Địa chỉ nhận hàng cụ thể</label>
+            <textarea id="customerAddress" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." rows="3" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Phương thức thanh toán</label>
+            <div class="payment-options">
+              <label class="payment-option-card">
+                <input type="radio" name="paymentMethod" value="payment_cod" checked>
+                <div class="option-details">
+                  <span>💵 COD (Tiền mặt)</span>
+                  <small>Thanh toán khi nhận hàng</small>
+                </div>
+              </label>
+              <label class="payment-option-card">
+                <input type="radio" name="paymentMethod" value="payment_bank">
+                <div class="option-details">
+                  <span>🏦 Chuyển khoản QR</span>
+                  <small>Quét mã VietQR nhận tiền tự động</small>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-checkout" id="submitOrderBtn">🚀 ĐẶT HÀNG NGAY</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code Payment Screen (Appears after successful checkout if QR payment selected) -->
+  <div class="modal-backdrop" id="qrModal">
+    <div class="modal-content qr-modal-content">
+      <div class="qr-header">
+        <h3>🏦 Thanh Toán Chuyển Khoản QR</h3>
+      </div>
+      <div class="qr-body" id="qrModalBody">
+        <!-- Injected QR details and image -->
+      </div>
+      <button class="btn-close-qr" id="closeQrModalBtn">Hoàn Tất & Đóng</button>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

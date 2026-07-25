@@ -15,6 +15,116 @@ if (!token || token.includes("YOUR_TELEGRAM_BOT_TOKEN")) {
 // Khởi tạo bot
 const bot = new Bot(token);
 
+// Tích hợp Express Server để phục vụ giao diện Web App
+const express = require("express");
+const path = require("path");
+const app = express();
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+// API trả về danh sách 10 loại trà
+app.get("/api/products", (req, res) => {
+  res.json(products);
+});
+
+// API nhận đơn đặt hàng từ Web App gửi lên
+app.post("/api/checkout", async (req, res) => {
+  try {
+    const { cart, orderData, paymentMethod, tgUser } = req.body;
+    const itemIds = Object.keys(cart).filter(id => cart[id] > 0);
+    const orderId = `BILL-${Date.now().toString().slice(-6)}`;
+    
+    let productSummary = "";
+    let totalAmount = 0;
+    
+    for (const id of itemIds) {
+      const product = products.find(p => p.id === id);
+      if (product) {
+        const qty = cart[id];
+        const itemTotal = product.price * qty;
+        totalAmount += itemTotal;
+        productSummary += `- ${escapeHTML(product.name)} (x${qty}): ${formatVND(itemTotal)}\n`;
+      }
+    }
+    
+    // Tạo QR chuyển khoản ngân hàng nếu chọn payment_bank
+    let qrCodeUrl = "";
+    let description = "";
+    if (paymentMethod === "payment_bank") {
+      const BANK_ID = process.env.BANK_ID || "ocb";
+      const ACCOUNT_NO = process.env.BANK_ACCOUNT_NO || "0982441446";
+      const ACCOUNT_NAME = process.env.BANK_ACCOUNT_NAME || "QUANG NHUT TRI";
+      const ORDER_CODE = `DH${Date.now().toString().slice(-6)}`;
+      description = `Thanh toan don hang ${ORDER_CODE}`;
+      qrCodeUrl = `https://img.vietqr.io/image/${BANK_ID.toUpperCase()}-${ACCOUNT_NO}-compact2.jpg?amount=${Math.round(totalAmount)}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+    }
+    
+    const paymentLabel = paymentMethod === "payment_bank" ? "Chuyển khoản QR" : "Thanh toán COD (Nhận hàng trả tiền)";
+    
+    // Gửi thông báo đơn hàng mới cho Admin Chat ID
+    if (adminChatId && adminChatId !== "YOUR_ADMIN_CHAT_ID_HERE") {
+      let clientLink = "";
+      if (tgUser && tgUser.id) {
+        clientLink = `<a href="tg://user?id=${tgUser.id}">${escapeHTML(orderData.name)}</a>`;
+      } else {
+        clientLink = `<b>${escapeHTML(orderData.name)}</b> (Web client)`;
+      }
+      
+      const adminMessage = `🚨 <b>ĐƠN HÀNG MỚI TẠO TỪ WEB APP!</b>\n\n` +
+        `👤 <b>Tên khách hàng:</b> ${clientLink}\n` +
+        `📞 <b>Số điện thoại:</b> <code>${escapeHTML(orderData.phone)}</code>\n` +
+        `📍 <b>Địa chỉ:</b> <i>${escapeHTML(orderData.address)}</i>\n\n` +
+        `🛍️ <b>Danh sách sản phẩm đặt:</b>\n${productSummary}\n` +
+        `💰 <b>Tổng tiền:</b> <b>${formatVND(totalAmount)}</b>\n` +
+        `💳 <b>Hình thức thanh toán:</b> <b>${paymentLabel}</b>\n\n` +
+        `🔗 <b>Telegram ID khách:</b> ${tgUser ? `<code>${tgUser.id}</code> (@${tgUser.username || "Không có"})` : "Không dùng Telegram"}`;
+        
+      try {
+        await bot.api.sendMessage(adminChatId, adminMessage, { parse_mode: "HTML" });
+        console.log(`✅ Đã gửi thông báo đơn hàng ${orderId} cho Admin.`);
+      } catch (err) {
+        console.error("❌ Lỗi gửi thông báo cho Admin:", err.message);
+      }
+    }
+    
+    // Gửi tin nhắn Telegram riêng tư cám ơn khách hàng (nếu khách dùng Telegram Mini App)
+    if (tgUser && tgUser.id) {
+      const thankYouText = `🎉 <b>ĐẶT HÀNG THÀNH CÔNG!</b> 🎉\n\n` +
+        `Cảm ơn bạn đã mua sắm tại <b>${escapeHTML(storeName)}</b>.\n\n` +
+        `🆔 Mã đơn hàng: <code>${orderId}</code>\n` +
+        `💰 Tổng tiền: <b>${formatVND(totalAmount)}</b>\n` +
+        `💳 Hình thức: <i>${paymentLabel}</i>\n\n` +
+        `📞 Nhân viên cửa hàng sẽ liên hệ qua số điện thoại <code>${escapeHTML(orderData.phone)}</code> sớm nhất để xác nhận và giao hàng.`;
+        
+      try {
+        await bot.api.sendMessage(tgUser.id, thankYouText, { parse_mode: "HTML" });
+      } catch (err) {
+        // Bỏ qua nếu khách chưa chat với bot hoặc chặn bot
+      }
+    }
+    
+    res.json({
+      success: true,
+      orderId,
+      amount: totalAmount,
+      qrCodeUrl,
+      bankId: process.env.BANK_ID || "ocb",
+      accountNo: process.env.BANK_ACCOUNT_NO || "0982441446",
+      accountName: process.env.BANK_ACCOUNT_NAME || "QUANG NHUT TRI",
+      description
+    });
+  } catch (err) {
+    console.error("Error in /api/checkout:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Web Server is listening on port ${PORT}...`);
+});
+
 // Middleware log update để chẩn đoán lỗi nhận tin nhắn
 bot.use(async (ctx, next) => {
   console.log(`📥 Nhận update ID: ${ctx.update.update_id}, Type: ${Object.keys(ctx.update).filter(k => k !== 'update_id')[0]}`);
@@ -54,7 +164,7 @@ function escapeHTML(text) {
 
 // Menu chính của bot
 const mainKeyboard = new InlineKeyboard()
-  .text("📦 Xem Sản Phẩm", "view_products")
+  .webApp("📦 Mua hàng (Web App)", "https://banggiaonline.vn")
   .text("🛒 Giỏ Hàng", "view_cart")
   .row()
   .text("ℹ️ Hướng Dẫn Mua Hàng", "how_to_buy")
@@ -203,7 +313,7 @@ async function showCart(ctx, editInPlace = false) {
   const itemIds = Object.keys(cart).filter(id => cart[id] > 0);
 
   if (itemIds.length === 0) {
-    const emptyKeyboard = new InlineKeyboard().text("📦 Đi xem sản phẩm", "view_products");
+    const emptyKeyboard = new InlineKeyboard().webApp("📦 Đi xem sản phẩm", "https://banggiaonline.vn");
     const emptyText = "🛒 Giỏ hàng của bạn hiện tại đang trống. Hãy lựa chọn sản phẩm nhé!";
     if (editInPlace) {
       try {
