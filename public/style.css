@@ -1,15 +1,14 @@
-/* Modern Dark Theme Design System for Shop GIAMUA.COM.VN */
 :root {
-  /* HSL Tailored Color Palette */
-  --bg: hsl(220, 25%, 10%);
-  --card-bg: hsl(220, 25%, 16%);
-  --card-hover-bg: hsl(220, 25%, 20%);
-  --text-main: hsl(220, 20%, 95%);
-  --text-muted: hsl(220, 15%, 70%);
-  --primary: hsl(38, 90%, 55%); /* Bright gold tea color */
-  --primary-hover: hsl(38, 95%, 45%);
-  --accent: hsl(150, 60%, 45%); /* Emerald green */
-  --accent-hover: hsl(150, 70%, 35%);
+  /* HSL Tailored Color Palette - Nam A Bank Theme (Blue & Gold) */
+  --bg: hsl(215, 55%, 7%); /* Deep corporate navy background */
+  --card-bg: hsl(215, 40%, 13%); /* Midnight blue cards */
+  --card-hover-bg: hsl(215, 40%, 18%);
+  --text-main: hsl(215, 20%, 96%);
+  --text-muted: hsl(215, 15%, 72%);
+  --primary: hsl(42, 100%, 52%); /* Nam A Bank Bright Gold */
+  --primary-hover: hsl(42, 100%, 45%);
+  --accent: hsl(212, 100%, 40%); /* Nam A Bank Corporate Blue */
+  --accent-hover: hsl(212, 100%, 32%);
   --danger: hsl(354, 70%, 54%);
   
   --font-heading: 'Outfit', sans-serif;

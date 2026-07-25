@@ -164,7 +164,7 @@ function escapeHTML(text) {
 
 // Menu chính của bot
 const mainKeyboard = new InlineKeyboard()
-  .webApp("📦 Mua hàng (Web App)", "https://banggiaonline.vn")
+  .text("📦 Xem Sản Phẩm", "view_products")
   .text("🛒 Giỏ Hàng", "view_cart")
   .row()
   .text("ℹ️ Hướng Dẫn Mua Hàng", "how_to_buy")
@@ -313,7 +313,7 @@ async function showCart(ctx, editInPlace = false) {
   const itemIds = Object.keys(cart).filter(id => cart[id] > 0);
 
   if (itemIds.length === 0) {
-    const emptyKeyboard = new InlineKeyboard().webApp("📦 Đi xem sản phẩm", "https://banggiaonline.vn");
+    const emptyKeyboard = new InlineKeyboard().text("📦 Đi xem sản phẩm", "view_products");
     const emptyText = "🛒 Giỏ hàng của bạn hiện tại đang trống. Hãy lựa chọn sản phẩm nhé!";
     if (editInPlace) {
       try {
