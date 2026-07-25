@@ -490,14 +490,13 @@ async function processOrderComplete(ctx, paymentMethod) {
   // 10.1. Gửi thông báo cho Admin (Nếu được cấu hình)
   if (adminChatId && adminChatId !== "YOUR_ADMIN_CHAT_ID_HERE") {
     const adminMessage = `🚨 <b>ĐƠN HÀNG MỚI ĐÃ ĐƯỢC TẠO!</b>\n\n` +
-      `🆔 Mã đơn hàng: <code>${orderId}</code>\n` +
-      `👤 Khách hàng: <b>${escapeHTML(orderData.name)}</b>\n` +
-      `📞 Số điện thoại: <code>${escapeHTML(orderData.phone)}</code>\n` +
-      `📍 Địa chỉ giao hàng: <i>${escapeHTML(orderData.address)}</i>\n\n` +
-      `🛍️ <b>Danh sách sản phẩm:</b>\n${productSummary}\n` +
-      `💰 **Tổng tiền:** <b>${formatVND(totalAmount)}</b>\n` +
-      `💳 Hình thức thanh toán: <b>${escapeHTML(paymentMethod)}</b>\n\n` +
-      `👤 Username khách hàng: @${escapeHTML(ctx.from.username || "Không có username")}`;
+      `👤 <b>Tên khách hàng:</b> <a href="tg://user?id=${ctx.from.id}">${escapeHTML(orderData.name)}</a>\n` +
+      `📞 <b>Số điện thoại:</b> <code>${escapeHTML(orderData.phone)}</code>\n` +
+      `📍 <b>Địa chỉ:</b> <i>${escapeHTML(orderData.address)}</i>\n\n` +
+      `🛍️ <b>Danh sách sản phẩm đặt:</b>\n${productSummary}\n` +
+      `💰 <b>Tổng tiền:</b> <b>${formatVND(totalAmount)}</b>\n` +
+      `💳 <b>Hình thức thanh toán:</b> <b>${escapeHTML(paymentMethod)}</b>\n\n` +
+      `🔗 <b>Liên kết Telegram khách:</b> @${escapeHTML(ctx.from.username || "Không có username")} (ID: <code>${ctx.from.id}</code>)`;
 
     try {
       await bot.api.sendMessage(adminChatId, adminMessage, { parse_mode: "HTML" });
