@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Nhập Admin - Shop GIAMUA.COM.VN</title>
+  <!-- Google Fonts Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="login-body">
+
+  <div class="login-container">
+    <div class="login-header">
+      <h2>GIAMUA.COM.VN</h2>
+      <p>Trang Quản Trị Hệ Thống</p>
+    </div>
+    
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" id="username" placeholder="Nhập tài khoản" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+      </div>
+
+      <div id="errorMessage" class="error-message"></div>
+
+      <button type="submit" class="btn-login">ĐĂNG NHẬP HỆ THỐNG</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const errorDiv = document.getElementById("errorMessage");
+      
+      errorDiv.textContent = "";
+
+      try {
+        const res = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          // Redirect to dashboard
+          window.location.href = "/admin/dashboard.html";
+        } else {
+          errorDiv.textContent = data.error || "Tên đăng nhập hoặc mật khẩu không chính xác!";
+        }
+      } catch (err) {
+        errorDiv.textContent = "Không thể kết nối đến máy chủ!";
+      }
+    });
+  </script>
+</body>
+</html>

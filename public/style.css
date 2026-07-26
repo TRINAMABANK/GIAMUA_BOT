@@ -569,3 +569,180 @@ body {
     font-size: 1.6rem;
   }
 }
+
+/* Support Section styling - Glassmorphism & Nam A Bank Theme */
+.support-section {
+  padding: 40px 0 20px 0;
+  margin-top: 20px;
+}
+
+.support-container {
+  display: flex;
+  justify-content: center;
+}
+
+.support-card {
+  width: 100%;
+  max-width: 600px;
+  background: radial-gradient(circle at top right, rgba(0, 79, 159, 0.1), var(--card-bg));
+  border: var(--glass-border);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: var(--shadow-premium);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.support-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 209, 0, 0.2);
+}
+
+.support-badge {
+  display: inline-block;
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 15px;
+}
+
+.support-card h2 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--primary), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+}
+
+.support-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 25px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.support-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.support-btn {
+  flex: 1;
+  max-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: var(--glass-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.support-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-call {
+  background: var(--primary);
+  border-color: rgba(255, 209, 0, 0.3);
+}
+
+.btn-call:hover {
+  background: var(--primary-hover);
+}
+
+.btn-call .btn-icon {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000;
+  font-size: 1.2rem;
+}
+
+.btn-call .btn-text span {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.btn-call .btn-text strong {
+  color: #000;
+}
+
+.btn-telegram {
+  background: var(--accent);
+  border-color: rgba(0, 79, 159, 0.3);
+}
+
+.btn-telegram:hover {
+  background: var(--accent-hover);
+}
+
+.btn-telegram .btn-icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.btn-telegram .btn-text span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-telegram .btn-text strong {
+  color: #fff;
+}
+
+.btn-icon {
+  font-size: 1.5rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-text span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.btn-text strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Responsive Support section */
+@media (max-width: 600px) {
+  .support-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .support-btn {
+    width: 100%;
+    max-width: 100%;
+  }
+}

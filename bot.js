@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Bot, session, InlineKeyboard } = require("grammy");
 const products = require("./products");
+const fs = require("fs");
 
 // Lấy biến môi trường
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -21,7 +22,114 @@ const path = require("path");
 const app = express();
 
 app.use(express.json());
+
+// Đường dẫn file cơ sở dữ liệu lưu thống kê & đơn hàng
+const dbPath = path.join(__dirname, "db.json");
+
+function loadDB() {
+  let data = { visits: { webapp: 0, bot: 0 }, orders: [] };
+  if (fs.existsSync(dbPath)) {
+    try {
+      const fileContent = fs.readFileSync(dbPath, "utf8");
+      data = JSON.parse(fileContent);
+    } catch (err) {
+      console.error("Error parsing db.json, resetting:", err.message);
+    }
+  }
+  // Đảm bảo cấu trúc luôn đầy đủ các khóa để tránh crash giao diện
+  if (!data.visits) data.visits = { webapp: 0, bot: 0 };
+  if (typeof data.visits.webapp !== "number") data.visits.webapp = 0;
+  if (typeof data.visits.bot !== "number") data.visits.bot = 0;
+  if (!data.orders || !Array.isArray(data.orders)) data.orders = [];
+  return data;
+}
+
+function saveDB(db) {
+  try {
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), "utf8");
+  } catch (err) {
+    console.error("Error saving db.json:", err.message);
+  }
+}
+
+// Middleware xác thực Admin bằng base64 token trong cookie (có giải mã URL)
+function checkAdminAuth(req) {
+  const cookies = req.headers.cookie || "";
+  const match = cookies.match(/admin_token=([^;]+)/);
+  if (!match) return false;
+  
+  try {
+    const token = decodeURIComponent(match[1].trim());
+    const expectedToken = Buffer.from(
+      `${process.env.ADMIN_USERNAME || "admin"}:${process.env.ADMIN_PASSWORD || "admin"}`
+    ).toString("base64");
+    return token === expectedToken;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Middleware đếm lượt truy cập website
+app.use((req, res, next) => {
+  if (req.path === "/" || req.path === "/index.html") {
+    try {
+      const db = loadDB();
+      db.visits.webapp += 1;
+      saveDB(db);
+    } catch (err) {
+      console.error("Error logging web visit:", err.message);
+    }
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "public")));
+
+// --- Các API trang quản trị Admin ---
+
+// GET /admin - Kiểm tra quyền truy cập và chuyển hướng
+app.get("/admin", (req, res) => {
+  if (checkAdminAuth(req)) {
+    res.sendFile(path.join(__dirname, "public", "admin", "dashboard.html"));
+  } else {
+    res.sendFile(path.join(__dirname, "public", "admin", "login.html"));
+  }
+});
+
+app.get("/admin/", (req, res) => {
+  res.redirect("/admin");
+});
+
+// POST /api/admin/login
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body;
+  const expectedUsername = process.env.ADMIN_USERNAME || "admin";
+  const expectedPassword = process.env.ADMIN_PASSWORD || "admin";
+
+  if (username === expectedUsername && password === expectedPassword) {
+    const token = Buffer.from(`${username}:${password}`).toString("base64");
+    // Thiết lập cookie admin_token tồn tại trong 24 giờ
+    res.cookie("admin_token", token, { maxAge: 24 * 3600 * 1000, httpOnly: true });
+    res.json({ success: true });
+  } else {
+    res.status(400).json({ success: false, error: "Sai tài khoản hoặc mật khẩu!" });
+  }
+});
+
+// GET /api/admin/stats - Lấy số liệu thống kê đơn hàng
+app.get("/api/admin/stats", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
+  }
+  const db = loadDB();
+  res.json({ success: true, stats: { visits: db.visits }, orders: db.orders });
+});
+
+// POST /api/admin/logout
+app.post("/api/admin/logout", (req, res) => {
+  res.clearCookie("admin_token");
+  res.json({ success: true });
+});
 
 // API trả về danh sách 10 loại trà
 app.get("/api/products", (req, res) => {
@@ -103,6 +211,25 @@ app.post("/api/checkout", async (req, res) => {
         // Bỏ qua nếu khách chưa chat với bot hoặc chặn bot
       }
     }
+
+    // Lưu đơn hàng vào cơ sở dữ liệu để thống kê
+    try {
+      const db = loadDB();
+      db.orders.push({
+        orderId,
+        customerName: orderData.name,
+        phone: orderData.phone,
+        address: orderData.address,
+        products: productSummary,
+        amount: totalAmount,
+        paymentMethod: paymentLabel,
+        source: "Web App",
+        timestamp: new Date().toISOString()
+      });
+      saveDB(db);
+    } catch (err) {
+      console.error("Lỗi lưu đơn hàng vào DB:", err.message);
+    }
     
     res.json({
       success: true,
@@ -174,6 +301,13 @@ const mainKeyboard = new InlineKeyboard()
 bot.command("start", async (ctx) => {
   // Reset trạng thái
   ctx.session.step = "idle";
+
+  // Ghi nhận lượt tương tác bot telegram
+  try {
+    const db = loadDB();
+    db.visits.bot += 1;
+    saveDB(db);
+  } catch (err) {}
   
   const welcomeText = `👋 Chào mừng bạn đến với <b>${escapeHTML(storeName)}</b>!\n\n` +
     `🤖 Tôi là bot bán hàng tự động của shop. Tại đây bạn có thể:\n` +
@@ -633,6 +767,25 @@ async function processOrderComplete(ctx, paymentMethod) {
     reply_markup: homeKeyboard
   });
 
+  // Lưu đơn hàng vào cơ sở dữ liệu để thống kê
+  try {
+    const db = loadDB();
+    db.orders.push({
+      orderId,
+      customerName: orderData.name,
+      phone: orderData.phone,
+      address: orderData.address,
+      products: productSummary,
+      amount: totalAmount,
+      paymentMethod,
+      source: "Telegram Bot",
+      timestamp: new Date().toISOString()
+    });
+    saveDB(db);
+  } catch (err) {
+    console.error("Lỗi lưu đơn hàng Telegram vào DB:", err.message);
+  }
+
   // Reset giỏ hàng của người dùng
   ctx.session.cart = {};
 }
@@ -661,8 +814,8 @@ bot.callbackQuery("contact_support", async (ctx) => {
   const supportText = `📞 <b>HỖ TRỢ KHÁCH HÀNG:</b>\n\n` +
     `Bạn có câu hỏi, thắc mắc hoặc cần giải quyết sự cố đơn hàng?\n\n` +
     `💬 Vui lòng liên hệ trực tiếp với Admin qua chat:\n` +
-    `👉 <b>Hotline/Zalo:</b> 090.xxx.xxxx\n` +
-    `👉 <b>Telegram Admin:</b> @quangtri_admin\n\n` +
+    `👉 <b>Hotline/Zalo:</b> 0982441446\n` +
+    `👉 <b>Telegram Admin:</b> @triqn2026\n\n` +
     `Chúng tôi luôn sẵn sàng hỗ trợ bạn!`;
 
   const backKeyboard = new InlineKeyboard().text("🔙 Quay lại Menu", "back_to_main");

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điều Khiển Admin - Shop GIAMUA.COM.VN</title>
+  <!-- Google Fonts Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="admin-header">
+    <div class="admin-container header-flex">
+      <div class="admin-logo">
+        <h1>GIAMUA.COM.VN <span>ADMIN</span></h1>
+      </div>
+      <div class="admin-actions">
+        <button id="refreshBtn" class="btn-action">🔄 Làm mới</button>
+        <button id="logoutBtn" class="btn-logout">🚪 Đăng xuất</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-container admin-main">
+    
+    <!-- Stats Cards Section -->
+    <section class="stats-grid">
+      <!-- Card 1: Web Visits -->
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-info">
+          <h3>Lượt Truy Cập Web</h3>
+          <p id="statWebVisits">0</p>
+        </div>
+      </div>
+      <!-- Card 2: Bot Visits -->
+      <div class="stat-card">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-info">
+          <h3>Lượt Tương Tác Bot</h3>
+          <p id="statBotVisits">0</p>
+        </div>
+      </div>
+      <!-- Card 3: Total Orders -->
+      <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-info">
+          <h3>Tổng Đơn Hàng</h3>
+          <p id="statTotalOrders">0</p>
+        </div>
+      </div>
+      <!-- Card 4: Total Revenue -->
+      <div class="stat-card highlight-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <h3>Tổng Doanh Thu</h3>
+          <p id="statTotalRevenue">0 ₫</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders Table Section -->
+    <section class="table-section">
+      <div class="section-header">
+        <h2>📋 DANH SÁCH ĐƠN HÀNG GẦN ĐÂY</h2>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Mã đơn</th>
+              <th>Khách hàng</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ giao hàng</th>
+              <th>Danh sách sản phẩm đặt mua</th>
+              <th>Tổng tiền</th>
+              <th>Hình thức</th>
+              <th>Nguồn</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <tr>
+              <td colspan="9" class="no-data">Đang tải danh sách đơn hàng...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
