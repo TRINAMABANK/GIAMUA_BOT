@@ -356,3 +356,22 @@ body {
     padding: 20px 15px;
   }
 }
+
+.btn-delete {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: var(--transition);
+}
+
+.btn-delete:hover {
+  background: #f44336;
+  color: #fff;
+  border-color: #f44336;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}

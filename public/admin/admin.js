@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 2. Render Orders Table
       ordersTableBody.innerHTML = "";
       if (orders.length === 0) {
-        ordersTableBody.innerHTML = `<tr><td colspan="9" class="no-data">📭 Chưa có đơn hàng nào được tạo.</td></tr>`;
+        ordersTableBody.innerHTML = `<tr><td colspan="10" class="no-data">📭 Chưa có đơn hàng nào được tạo.</td></tr>`;
         return;
       }
 
@@ -81,15 +81,40 @@ document.addEventListener("DOMContentLoaded", () => {
           <td style="color: var(--primary); font-weight: 700;">${formatVND(order.amount)}</td>
           <td>${order.paymentMethod}</td>
           <td><span class="badge-source ${sourceClass}">${order.source}</span></td>
+          <td><button class="btn-delete" data-id="${order.orderId}">🗑️ Xóa</button></td>
         `;
         ordersTableBody.appendChild(row);
       });
 
     } catch (err) {
       console.error("Dashboard loading error:", err);
-      ordersTableBody.innerHTML = `<tr><td colspan="9" class="no-data">❌ Lỗi tải dữ liệu. Vui lòng bấm "Làm mới" thử lại!</td></tr>`;
+      ordersTableBody.innerHTML = `<tr><td colspan="10" class="no-data">❌ Lỗi tải dữ liệu. Vui lòng bấm "Làm mới" thử lại!</td></tr>`;
     }
   }
+
+  // Handle Delete Order (Event Delegation)
+  document.getElementById("ordersTableBody").addEventListener("click", async (e) => {
+    if (e.target && e.target.classList.contains("btn-delete")) {
+      const orderId = e.target.getAttribute("data-id");
+      if (!confirm(`Bạn có chắc chắn muốn xóa đơn hàng ${orderId} này?`)) return;
+
+      try {
+        const res = await fetch("/api/admin/orders/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadDashboard(); // reload stats and orders table
+        } else {
+          alert("Lỗi xóa đơn hàng: " + data.error);
+        }
+      } catch (err) {
+        alert("Lỗi kết nối đến máy chủ!");
+      }
+    }
+  });
 
   // Handle Logout
   document.getElementById("logoutBtn").addEventListener("click", async () => {

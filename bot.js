@@ -131,6 +131,29 @@ app.post("/api/admin/logout", (req, res) => {
   res.json({ success: true });
 });
 
+// POST /api/admin/orders/delete - Xóa đơn hàng khỏi thống kê và danh sách
+app.post("/api/admin/orders/delete", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
+  }
+  const { orderId } = req.body;
+  if (!orderId) {
+    return res.status(400).json({ success: false, error: "Thiếu mã đơn hàng!" });
+  }
+  try {
+    const db = loadDB();
+    const initialLength = db.orders.length;
+    db.orders = db.orders.filter(order => order.orderId !== orderId);
+    if (db.orders.length === initialLength) {
+      return res.status(404).json({ success: false, error: "Không tìm thấy đơn hàng!" });
+    }
+    saveDB(db);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // API trả về danh sách 10 loại trà
 app.get("/api/products", (req, res) => {
   res.json(products);
