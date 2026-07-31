@@ -51,7 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
     productsGrid.innerHTML = "";
     products.forEach(p => {
       const card = document.createElement("div");
-      card.className = "product-card";
+      card.setAttribute("data-product-id", p.id);
+      const isSelected = cart[p.id] > 0;
+      card.className = isSelected ? "product-card selected-hud" : "product-card";
       card.innerHTML = `
         <div class="product-info">
           <h3 class="product-name">${p.name}</h3>
@@ -109,6 +111,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateCartUI() {
+    // Toggle selected HUD styling class for cards
+    document.querySelectorAll(".product-card").forEach(card => {
+      const pid = card.getAttribute("data-product-id");
+      if (pid) {
+        if (cart[pid] > 0) {
+          card.classList.add("selected-hud");
+        } else {
+          card.classList.remove("selected-hud");
+        }
+      }
+    });
+
     // Update Badge
     const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
     cartBadge.textContent = totalItems;

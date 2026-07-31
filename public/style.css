@@ -870,3 +870,55 @@ body {
   border-color: var(--accent);
   filter: drop-shadow(0 0 5px var(--accent));
 }
+
+/* Selected Card HUD Styling - Glowing Neon Cyan/Blue */
+.product-card.selected-hud {
+  border-color: hsl(190, 100%, 50%) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 200, 255, 0.25) !important;
+}
+
+.product-card.selected-hud::before {
+  border-top-color: hsl(190, 100%, 50%) !important;
+  border-left-color: hsl(190, 100%, 50%) !important;
+  filter: drop-shadow(0 0 5px hsl(190, 100%, 50%)) !important;
+  width: 15px;
+  height: 15px;
+}
+
+.product-card.selected-hud::after {
+  border-bottom-color: hsl(190, 100%, 50%) !important;
+  border-right-color: hsl(190, 100%, 50%) !important;
+  filter: drop-shadow(0 0 5px hsl(190, 100%, 50%)) !important;
+  width: 15px;
+  height: 15px;
+}
+
+.product-card.selected-hud .product-info::before {
+  border-top-color: hsl(190, 100%, 50%) !important;
+  border-right-color: hsl(190, 100%, 50%) !important;
+  filter: drop-shadow(0 0 5px hsl(190, 100%, 50%)) !important;
+  width: 15px;
+  height: 15px;
+}
+
+.product-card.selected-hud .product-info::after {
+  border-bottom-color: hsl(190, 100%, 50%) !important;
+  border-left-color: hsl(190, 100%, 50%) !important;
+  filter: drop-shadow(0 0 5px hsl(190, 100%, 50%)) !important;
+  width: 15px;
+  height: 15px;
+}
+
+.product-card.selected-hud:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 200, 255, 0.45) !important;
+}
+
+.product-card.selected-hud:hover::before,
+.product-card.selected-hud:hover::after,
+.product-card.selected-hud:hover .product-info::before,
+.product-card.selected-hud:hover .product-info::after {
+  border-color: hsl(190, 100%, 50%) !important;
+  filter: drop-shadow(0 0 8px hsl(190, 100%, 50%)) !important;
+  width: 20px;
+  height: 20px;
+}
