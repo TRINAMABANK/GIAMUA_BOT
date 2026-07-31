@@ -883,7 +883,7 @@ body {
 
 /* Selected Card HUD Styling - Glowing Neon Cyan/Blue */
 .product-card.selected-hud {
-  border-color: hsl(190, 100%, 50%) !important;
+  border-color: transparent !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 200, 255, 0.25) !important;
 }
 
@@ -948,17 +948,15 @@ body {
   transition: opacity 0.3s ease;
 }
 
-/* Show rotating border light on hover */
-.product-card:hover .hud-glow {
+/* Show rotating border light on hover OR when selected (for mobile/tablet) */
+.product-card:hover .hud-glow,
+.product-card.selected-hud .hud-glow {
   opacity: 1;
 }
 
-/* Hide default borders on hover to let the laser shine through */
-.product-card:hover {
-  border-color: transparent !important;
-}
-
-.product-card.selected-hud:hover {
+/* Hide default borders on hover or when selected to let the laser shine through */
+.product-card:hover,
+.product-card.selected-hud {
   border-color: transparent !important;
 }
 
