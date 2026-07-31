@@ -1,23 +1,23 @@
 :root {
-  /* HSL Tailored Color Palette - Nam A Bank Theme (Blue & Gold) */
-  --bg: hsl(215, 55%, 7%); /* Deep corporate navy background */
-  --card-bg: hsl(215, 40%, 13%); /* Midnight blue cards */
-  --card-hover-bg: hsl(215, 40%, 18%);
-  --text-main: hsl(215, 20%, 96%);
-  --text-muted: hsl(215, 15%, 72%);
-  --primary: hsl(42, 100%, 52%); /* Nam A Bank Bright Gold */
-  --primary-hover: hsl(42, 100%, 45%);
-  --accent: hsl(212, 100%, 40%); /* Nam A Bank Corporate Blue */
-  --accent-hover: hsl(212, 100%, 32%);
-  --danger: hsl(354, 70%, 54%);
+  /* HSL Tailored Color Palette - Cyberpunk Tech Theme (Red, Black, Pink) */
+  --bg: hsl(0, 0%, 3%); /* Pitch obsidian black background */
+  --card-bg: hsl(0, 0%, 9%); /* Dark carbon/obsidian card background */
+  --card-hover-bg: hsl(0, 0%, 14%);
+  --text-main: hsl(0, 0%, 96%);
+  --text-muted: hsl(0, 0%, 70%);
+  --primary: hsl(330, 100%, 65%); /* Neon Pink Accent */
+  --primary-hover: hsl(330, 100%, 55%);
+  --accent: hsl(355, 100%, 58%); /* Electric Neon Red Accent */
+  --accent-hover: hsl(355, 100%, 48%);
+  --danger: hsl(355, 100%, 58%);
   
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
   
   --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --shadow-premium: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --shadow-premium: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 40, 150, 0.08);
   --glass-effect: backdrop-filter: blur(12px);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --glass-border: 1px solid rgba(255, 40, 150, 0.15); /* Glowing pink/red glass border */
 }
 
 /* Reset & Base Styles */
@@ -50,7 +50,7 @@ body {
   left: 0;
   right: 0;
   height: 70px;
-  background: rgba(15, 20, 30, 0.85);
+  background: rgba(5, 5, 5, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: var(--glass-border);
   z-index: 1000;
@@ -130,7 +130,7 @@ body {
 .hero {
   padding: 40px 0;
   text-align: center;
-  background: radial-gradient(circle at center, rgba(38, 90, 55, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(255, 40, 150, 0.12) 0%, transparent 70%);
 }
 
 .hero h2 {
@@ -167,8 +167,8 @@ body {
 .product-card:hover {
   transform: translateY(-8px);
   background-color: var(--card-hover-bg);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border-color: var(--primary);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 40, 150, 0.25);
 }
 
 .product-info {
@@ -584,7 +584,7 @@ body {
 .support-card {
   width: 100%;
   max-width: 600px;
-  background: radial-gradient(circle at top right, rgba(0, 79, 159, 0.1), var(--card-bg));
+  background: radial-gradient(circle at top right, rgba(255, 40, 150, 0.1), var(--card-bg));
   border: var(--glass-border);
   border-radius: 20px;
   padding: 30px;
@@ -597,7 +597,7 @@ body {
 
 .support-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 209, 0, 0.2);
+  border-color: var(--primary);
 }
 
 .support-badge {
@@ -662,7 +662,7 @@ body {
 
 .btn-call {
   background: var(--primary);
-  border-color: rgba(255, 209, 0, 0.3);
+  border-color: rgba(255, 40, 150, 0.3);
 }
 
 .btn-call:hover {
@@ -685,7 +685,7 @@ body {
 
 .btn-telegram {
   background: var(--accent);
-  border-color: rgba(0, 79, 159, 0.3);
+  border-color: rgba(255, 0, 0, 0.3);
 }
 
 .btn-telegram:hover {
