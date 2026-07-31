@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isSelected = cart[p.id] > 0;
       card.className = isSelected ? "product-card selected-hud" : "product-card";
       card.innerHTML = `
+        <div class="hud-glow"></div>
         <div class="product-info">
           <h3 class="product-name">${p.name}</h3>
           <p class="product-desc">${p.description}</p>
