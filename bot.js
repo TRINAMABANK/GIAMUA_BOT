@@ -23,6 +23,26 @@ const app = express();
 
 app.use(express.json());
 
+// Thiết lập mã bảo mật Content-Security-Policy (CSP) ngăn chặn hoàn toàn quảng cáo và script lạ chèn vào
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org https://*.telegram.org; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com; " +
+    "img-src 'self' data: https://img.vietqr.io https://*.vietqr.io; " +
+    "connect-src 'self' https://api.vietqr.io; " +
+    "frame-ancestors 'self' https://telegram.org https://*.telegram.org;"
+  );
+  
+  // Các tiêu đề bảo mật bổ sung để chống chèn iframe (clickjacking)
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
+  next();
+});
+
 // Đường dẫn file cơ sở dữ liệu lưu thống kê & đơn hàng
 const dbPath = path.join(__dirname, "db.json");
 
