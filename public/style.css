@@ -746,3 +746,127 @@ body {
     max-width: 100%;
   }
 }
+
+/* Global HUD Viewport Frame */
+.hud-viewport-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border: 1px solid rgba(255, 40, 150, 0.05);
+  margin: 8px;
+  box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.02);
+}
+
+.hud-viewport-frame::before, .hud-viewport-frame::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-color: rgba(255, 40, 150, 0.3);
+  border-style: solid;
+  pointer-events: none;
+}
+
+/* Top-left corner */
+.hud-viewport-frame::before {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+/* Bottom-right corner */
+.hud-viewport-frame::after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* HUD Sci-fi Corner Brackets for Product Cards */
+.product-card {
+  position: relative;
+}
+
+.product-card::before, .product-card::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 5;
+}
+
+.product-card::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+}
+
+.product-card::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid var(--primary);
+  border-right: 2px solid var(--primary);
+}
+
+.product-info {
+  position: relative;
+}
+
+.product-info::before, .product-info::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 5;
+}
+
+.product-info::before {
+  top: 0;
+  right: 0;
+  border-top: 2px solid var(--primary);
+  border-right: 2px solid var(--primary);
+}
+
+.product-info::after {
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+}
+
+/* Hover effects for HUD corner brackets */
+.product-card:hover::before {
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+
+.product-card:hover::after {
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+
+.product-card:hover .product-info::before {
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+
+.product-card:hover .product-info::after {
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent));
+}
