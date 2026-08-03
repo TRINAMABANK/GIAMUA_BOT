@@ -93,7 +93,79 @@
       </div>
     </section>
 
+    <!-- Products Management Section -->
+    <section class="table-section" style="margin-top: 30px;">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>📦 QUẢN LÝ DANH SÁCH SẢN PHẨM</h2>
+        <button id="addProductBtn" class="btn-action" style="padding: 10px 20px;">➕ Thêm sản phẩm mới</button>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Ảnh</th>
+              <th>Mã SP</th>
+              <th>Tên sản phẩm</th>
+              <th>Danh mục</th>
+              <th>Giá bán</th>
+              <th>Mô tả chi tiết</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <tr>
+              <td colspan="7" class="no-data">Đang tải danh sách sản phẩm...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
+
+  <!-- Add/Edit Product Modal Form -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Thêm sản phẩm mới</h3>
+        <span class="close-btn" id="closeModalBtn">&times;</span>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="prodId">
+        
+        <div class="form-group">
+          <label for="prodName">Tên sản phẩm (*):</label>
+          <input type="text" id="prodName" required placeholder="Ví dụ: 🍵 Trà Oolong Thượng Hạng">
+        </div>
+        
+        <div class="form-group">
+          <label for="prodPrice">Giá bán (*):</label>
+          <input type="number" id="prodPrice" required placeholder="Ví dụ: 2699000">
+        </div>
+        
+        <div class="form-group">
+          <label for="prodCategory">Danh mục (*):</label>
+          <input type="text" id="prodCategory" required placeholder="Ví dụ: Trà Oolong">
+        </div>
+        
+        <div class="form-group">
+          <label for="prodImage">Link hình ảnh:</label>
+          <input type="url" id="prodImage" placeholder="Ví dụ: https://images.unsplash.com/...">
+        </div>
+        
+        <div class="form-group">
+          <label for="prodDescription">Mô tả sản phẩm (*):</label>
+          <textarea id="prodDescription" required rows="4" placeholder="Mô tả chi tiết hương vị, tác dụng..."></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" id="saveProductBtn" class="btn-action" style="padding: 10px 20px;">💾 Lưu lại</button>
+          <button type="button" id="cancelProductBtn" class="btn-logout" style="padding: 10px 20px;">❌ Hủy bỏ</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="admin.js"></script>
 </body>

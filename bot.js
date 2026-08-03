@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { Bot, session, InlineKeyboard } = require("grammy");
-const products = require("./products");
+const defaultProducts = require("./products");
 const fs = require("fs");
 
 // Lấy biến môi trường
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 const dbPath = path.join(__dirname, "db.json");
 
 function loadDB() {
-  let data = { visits: { webapp: 0, bot: 0 }, orders: [] };
+  let data = { visits: { webapp: 0, bot: 0 }, orders: [], products: [] };
   if (fs.existsSync(dbPath)) {
     try {
       const fileContent = fs.readFileSync(dbPath, "utf8");
@@ -61,7 +61,22 @@ function loadDB() {
   if (typeof data.visits.webapp !== "number") data.visits.webapp = 0;
   if (typeof data.visits.bot !== "number") data.visits.bot = 0;
   if (!data.orders || !Array.isArray(data.orders)) data.orders = [];
+  
+  // Khởi tạo sản phẩm mặc định nếu trống
+  if (!data.products || !Array.isArray(data.products) || data.products.length === 0) {
+    data.products = defaultProducts;
+    try {
+      fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), "utf8");
+    } catch (e) {
+      console.error("Error saving initialized products to db.json:", e.message);
+    }
+  }
   return data;
+}
+
+function getProducts() {
+  const db = loadDB();
+  return db.products || [];
 }
 
 function saveDB(db) {
@@ -174,9 +189,84 @@ app.post("/api/admin/orders/delete", (req, res) => {
   }
 });
 
-// API trả về danh sách 10 loại trà
+// GET /api/admin/products - Lấy danh sách sản phẩm quản trị
+app.get("/api/admin/products", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
+  }
+  res.json({ success: true, products: getProducts() });
+});
+
+// POST /api/admin/products/save - Lưu sản phẩm (thêm mới hoặc sửa)
+app.post("/api/admin/products/save", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
+  }
+  const { id, name, price, category, image, description } = req.body;
+  if (!name || !price || !category || !description) {
+    return res.status(400).json({ success: false, error: "Vui lòng nhập đầy đủ các trường thông tin bắt buộc!" });
+  }
+  try {
+    const db = loadDB();
+    if (id) {
+      // Chế độ sửa sản phẩm
+      const index = db.products.findIndex(p => p.id === id);
+      if (index === -1) {
+        return res.status(404).json({ success: false, error: "Không tìm thấy sản phẩm cần sửa!" });
+      }
+      db.products[index] = {
+        id,
+        name,
+        price: parseFloat(price),
+        category,
+        image: image || "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
+        description
+      };
+    } else {
+      // Chế độ thêm sản phẩm mới
+      const newId = `prod_${Date.now().toString().slice(-6)}`;
+      db.products.push({
+        id: newId,
+        name,
+        price: parseFloat(price),
+        category,
+        image: image || "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=600&auto=format&fit=crop&q=80",
+        description
+      });
+    }
+    saveDB(db);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/admin/products/delete - Xóa sản phẩm khỏi hệ thống
+app.post("/api/admin/products/delete", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: "Unauthorized" });
+  }
+  const { productId } = req.body;
+  if (!productId) {
+    return res.status(400).json({ success: false, error: "Thiếu mã sản phẩm!" });
+  }
+  try {
+    const db = loadDB();
+    const initialLength = db.products.length;
+    db.products = db.products.filter(p => p.id !== productId);
+    if (db.products.length === initialLength) {
+      return res.status(404).json({ success: false, error: "Không tìm thấy sản phẩm!" });
+    }
+    saveDB(db);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API trả về danh sách sản phẩm (Dành cho webapp hiển thị)
 app.get("/api/products", (req, res) => {
-  res.json(products);
+  res.json(getProducts());
 });
 
 // API nhận đơn đặt hàng từ Web App gửi lên
@@ -190,7 +280,7 @@ app.post("/api/checkout", async (req, res) => {
     let totalAmount = 0;
     
     for (const id of itemIds) {
-      const product = products.find(p => p.id === id);
+      const product = getProducts().find(p => p.id === id);
       if (product) {
         const qty = cart[id];
         const itemTotal = product.price * qty;
@@ -376,7 +466,7 @@ async function showProductMenu(ctx, editInPlace = false) {
     `<i>Vui lòng chọn trà bạn muốn xem chi tiết và đặt mua bên dưới:</i>`;
 
   const menuKeyboard = new InlineKeyboard();
-  for (const product of products) {
+  for (const product of getProducts()) {
     menuKeyboard.text(`${product.name} - ${formatVND(product.price)}`, `select_prod:${product.id}`).row();
   }
   menuKeyboard.text("🔙 Quay lại Menu chính", "back_to_main");
@@ -402,7 +492,7 @@ async function showProductMenu(ctx, editInPlace = false) {
 bot.callbackQuery(/^select_prod:(.+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const productId = ctx.match[1];
-  const product = products.find(p => p.id === productId);
+  const product = getProducts().find(p => p.id === productId);
   if (!product) return;
 
   const productText = `🍵 <b>${escapeHTML(product.name)}</b>\n\n` +
@@ -429,7 +519,7 @@ bot.callbackQuery(/^select_prod:(.+)$/, async (ctx) => {
 bot.callbackQuery(/^view_desc:(.+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const productId = ctx.match[1];
-  const product = products.find(p => p.id === productId);
+  const product = getProducts().find(p => p.id === productId);
   if (!product) return;
 
   const descText = `🍵 <b>${escapeHTML(product.name)}</b>\n\n` +
@@ -456,7 +546,7 @@ bot.callbackQuery(/^view_desc:(.+)$/, async (ctx) => {
 // 3. Thêm sản phẩm vào giỏ hàng (Chuyển tiếp thẳng đến trang Giỏ hàng để Thanh toán nhanh)
 bot.callbackQuery(/^add_to_cart:(.+)$/, async (ctx) => {
   const productId = ctx.match[1];
-  const product = products.find(p => p.id === productId);
+  const product = getProducts().find(p => p.id === productId);
 
   if (!product) {
     await ctx.answerCallbackQuery({ text: "Sản phẩm không tồn tại!", show_alert: true });
@@ -509,7 +599,7 @@ async function showCart(ctx, editInPlace = false) {
 
   const cartKeyboard = new InlineKeyboard();
   for (const id of itemIds) {
-    const product = products.find(p => p.id === id);
+    const product = getProducts().find(p => p.id === id);
     if (product) {
       const qty = cart[id];
       const itemTotal = product.price * qty;
@@ -676,7 +766,7 @@ bot.on("message:text", async (ctx) => {
 
     let totalAmount = 0;
     for (const id of itemIds) {
-      const product = products.find(p => p.id === id);
+      const product = getProducts().find(p => p.id === id);
       if (product) {
         const qty = cart[id];
         const itemTotal = product.price * qty;
@@ -723,7 +813,7 @@ bot.callbackQuery("payment_bank", async (ctx) => {
   const cart = ctx.session.cart;
   let totalAmount = 0;
   for (const id in cart) {
-    const product = products.find(p => p.id === id);
+    const product = getProducts().find(p => p.id === id);
     if (product) totalAmount += product.price * cart[id];
   }
 
@@ -765,7 +855,7 @@ async function processOrderComplete(ctx, paymentMethod) {
   let totalAmount = 0;
 
   for (const id of itemIds) {
-    const product = products.find(p => p.id === id);
+    const product = getProducts().find(p => p.id === id);
     if (product) {
       const qty = cart[id];
       const itemTotal = product.price * qty;
